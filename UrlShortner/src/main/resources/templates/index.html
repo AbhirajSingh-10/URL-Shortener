@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple URL Shortener</title>
+    <!-- A little bit of styling to make it look nicer -->
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        h1, h2 { color: #333; }
+        form div { margin-bottom: 10px; }
+        input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; }
+        input[type="submit"] { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background-color: #e9f7ef; border: 1px solid #b7e4c7; border-radius: 4px; }
+        .result p { margin: 5px 0; }
+        .result a { color: #0056b3; text-decoration: none; font-weight: bold; }
+        .result a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<h1>Welcome to the URL Shortener!</h1>
+
+<form th:action="@{/shorten-web}" method="POST">
+    <div>
+        <label for="longUrl">Enter a long URL to shorten:</label>
+    </div>
+    <div>
+        <input type="text" id="longUrl" name="longUrl" size="50" placeholder="https://example.com/very/long/url" required>
+    </div>
+    <div>
+        <input type="submit" value="Shorten URL">
+    </div>
+</form>
+
+<!-- --- NEWLY ADDED CODE START --- -->
+
+<!--
+  This entire <div> block will only be rendered IF the 'shortUrlResult' variable exists in the Model.
+  th:if="${shortUrlResult != null}" is a Thymeleaf condition.
+  On the initial page load, 'shortUrlResult' is null, so this whole block is hidden.
+  After a successful form submission, the controller adds 'shortUrlResult' to the model,
+  the condition becomes true, and this block is displayed.
+-->
+<div class="result" th:if="${shortUrlResult != null}">
+    <h2>Success! Here is your short URL:</h2>
+
+    <p>
+        Original URL:
+        <!--
+          th:text replaces the content of this <span> with the value of the 'originalUrl' variable from the Model.
+          We use a <span> to avoid breaking the text flow.
+        -->
+        <span th:text="${originalUrl}">https://example.com/original-url-goes-here</span>
+    </p>
+
+    <p>
+        Short URL:
+        <!--
+          This is a powerful combination of Thymeleaf attributes on an anchor (<a>) tag.
+          - th:href sets the 'href' attribute, making the link clickable. It uses the value from 'shortUrlResult'.
+          - th:text sets the visible text of the link, also using 'shortUrlResult'.
+          - target="_blank" is a standard HTML attribute to open the link in a new tab.
+        -->
+        <a th:href="${shortUrlResult}" th:text="${shortUrlResult}" target="_blank">http://localhost:8080/short-url-goes-here</a>
+    </p>
+</div>
+
+
+<hr>
+
+<h2>"Check Link Statistics"</h2>
+
+<form th:action="@{/check-stats}" method="POST">
+    <div>
+        <!-- The label for our new input field, linked via the 'for' attribute. -->
+        <label for="checkShortCode">Enter a short code to check its stats:</label>
+    </div>
+    <div>
+        <!--
+          This is the input field for the short code.
+          - id="checkShortCode": A unique ID, used by the label.
+          - name="checkShortCode": CRITICAL! This is the key our Spring controller will use
+            to retrieve the submitted value from the request.
+          - placeholder: A helpful hint for the user.
+          - required: Prevents submitting an empty form.
+        -->
+        <input type="text" id="checkShortCode" name="checkShortCode" size="20" placeholder="e.g., aB1cDe" required>
+    </div>
+    <div>
+        <!-- The submit button for this form. -->
+        <input type="submit" value="Check Stats">
+    </div>
+</form>
+
+<div class="result" th:if="${urlStats != null}">
+    <h3>Statistics</h3>
+    <p><strong>Original URL:</strong> <span th:text="${urlStats.originalUrl}"></span></p>
+    <p><strong>Short URL:</strong> <a th:href="${urlStats.shortUrl}" th:text="${urlStats.shortUrl}" target="_blank"></a></p>
+    <p><strong>Created On:</strong> <span th:text="${#temporals.format(urlStats.creationDate, 'dd-MMM-yyyy HH:mm')}"></span></p>
+    <p><strong>Total Clicks:</strong> <span th:text="${urlStats.clickCount}"></span></p>
+</div>
+
+<!-- Case 2: Error. This block is rendered only if the "statsError" message exists in the model. -->
+<div class="result" style="background-color: #f8d7da; border-color: #f5c6cb;" th:if="${statsError != null}">
+    <p style="color: #721c24;" th:text="${statsError}"></p>
+</div>
+
+</body>
+</html>
