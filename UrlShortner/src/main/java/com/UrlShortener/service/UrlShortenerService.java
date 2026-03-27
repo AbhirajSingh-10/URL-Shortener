@@ -24,7 +24,7 @@ public class UrlShortenerService {
 
 
     @Transactional
-    public String shortenUrl(String originalUrl, String customAlias){
+    public String shortenUrl(String originalUrl, String customAlias, Integer hoursToExpire){
 
         if(StringUtils.hasText(customAlias)){
             Optional<UrlMapping> existingMapping = urlMappingRepository.findByShortCode(customAlias);
@@ -37,6 +37,11 @@ public class UrlShortenerService {
             newUrlMapping.setOriginalUrl(originalUrl);
             newUrlMapping.setCreationDate(LocalDateTime.now());
             newUrlMapping.setShortCode(customAlias);
+
+            if(hoursToExpire!=null){
+                newUrlMapping.setExpirationDate(LocalDateTime.now().plusHours(hoursToExpire));
+            }
+
             urlMappingRepository.save(newUrlMapping);
 
             return customAlias;
@@ -44,6 +49,10 @@ public class UrlShortenerService {
             UrlMapping urlMapping = new UrlMapping();
             urlMapping.setOriginalUrl(originalUrl);
             urlMapping.setCreationDate(LocalDateTime.now());
+
+            if(hoursToExpire!=null){
+                urlMapping.setExpirationDate(LocalDateTime.now().plusHours(hoursToExpire));
+            }
 
             UrlMapping savedEntity = urlMappingRepository.save(urlMapping);
 
@@ -72,6 +81,10 @@ public class UrlShortenerService {
     public UrlStatsResponse getStats(String shortCode){
         UrlMapping urlMapping = urlMappingRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new UrlNotFoundException("Url not found with shortcode :"+ shortCode));
+
+        if(urlMapping.getExpirationDate() != null && urlMapping.getExpirationDate().isBefore(LocalDateTime.now())){
+            throw new UrlNotFoundException("This link is expired and no longer active.");
+        }
 
         String fullShortUrl = "http://localhost:8080/" + urlMapping.getShortCode();
 

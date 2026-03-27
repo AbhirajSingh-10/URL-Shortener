@@ -27,13 +27,14 @@ public class PageController {
     @PostMapping("/shorten-web")
     public String handleShortenForm(@RequestParam("longUrl") String longUrl,
                                     @RequestParam(name="customAlias", required = false) String customAlias,
+                                    @RequestParam(name="expiry", required = false) Integer expiry,
                                     Model model
     ) {
 
         model.addAttribute("originalUrl", longUrl);
 
         try{
-            String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias);
+            String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias,expiry);
             String fullShortCode = "http://localhost:8080/" + shortCode;
 
             model.addAttribute("shortUrlResult", fullShortCode);

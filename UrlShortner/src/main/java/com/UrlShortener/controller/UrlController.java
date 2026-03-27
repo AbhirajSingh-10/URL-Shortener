@@ -22,10 +22,9 @@ public class UrlController {
 
     @PostMapping("api/v1/url/shorten")
     public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request){
-        String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias());
+        String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias(), request.hoursToExpire());
 
         String fullShortUrl = "http://localhost:8080/"+shortCode;
-
 
         ShortenUrlResponse response = new ShortenUrlResponse(fullShortUrl);
 
