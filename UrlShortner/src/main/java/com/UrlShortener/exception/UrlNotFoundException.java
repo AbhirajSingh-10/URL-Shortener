@@ -1,4 +1,4 @@
-package com.urlshrt.UrlShortener.exception;
+package com.UrlShortener.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,4 +1,4 @@
-package com.urlshrt.UrlShortener.exception;
+package com.UrlShortener.exception;
 
 
 import org.springframework.http.HttpStatus;
@@ -25,5 +25,18 @@ public class GlobalExceptionHandler {
         body.put("path",request.getDescription(false).replace("uri=",""));
 
         return new ResponseEntity<>(body,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AliasAlreadyExistsException.class)
+    public ResponseEntity<Object> handleAliasAlreadyExistsException(AliasAlreadyExistsException ex, WebRequest request){
+        Map<String,Object> body = new LinkedHashMap<>();
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflict");
+        body.put("message", ex.getMessage());
+        body.put("path",request.getDescription(false).replace("uri=",""));
+
+        return new ResponseEntity<>(body,HttpStatus.CONFLICT);
     }
 }

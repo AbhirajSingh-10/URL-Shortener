@@ -1,11 +1,10 @@
-package com.urlshrt.UrlShortener.controller;
+package com.UrlShortener.controller;
 
-import com.urlshrt.UrlShortener.dto.ShortenUrlRequest;
-import com.urlshrt.UrlShortener.dto.ShortenUrlResponse;
-import com.urlshrt.UrlShortener.dto.UrlStatsResponse;
-import com.urlshrt.UrlShortener.service.UrlShortenerService;
+import com.UrlShortener.dto.ShortenUrlRequest;
+import com.UrlShortener.dto.ShortenUrlResponse;
+import com.UrlShortener.dto.UrlStatsResponse;
+import com.UrlShortener.service.UrlShortenerService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,7 @@ public class UrlController {
 
     @PostMapping("api/v1/url/shorten")
     public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request){
-        String shortCode = urlShortenerService.shortenUrl(request.url());
+        String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias());
 
         String fullShortUrl = "http://localhost:8080/"+shortCode;
 

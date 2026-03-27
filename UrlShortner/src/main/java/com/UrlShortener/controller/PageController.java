@@ -1,8 +1,9 @@
-package com.urlshrt.UrlShortener.controller;
+package com.UrlShortener.controller;
 
-import com.urlshrt.UrlShortener.dto.UrlStatsResponse;
-import com.urlshrt.UrlShortener.exception.UrlNotFoundException;
-import com.urlshrt.UrlShortener.service.UrlShortenerService;
+import com.UrlShortener.dto.UrlStatsResponse;
+import com.UrlShortener.exception.AliasAlreadyExistsException;
+import com.UrlShortener.exception.UrlNotFoundException;
+import com.UrlShortener.service.UrlShortenerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,17 +25,22 @@ public class PageController {
     }
 
     @PostMapping("/shorten-web")
-    public String handleShortenForm(@RequestParam("longUrl") String longUrl, Model model) {
-        String shortCode = urlShortenerService.shortenUrl(longUrl);
-
-
-        String fullShortUrl = "http://localhost:8080/" + shortCode;
-
+    public String handleShortenForm(@RequestParam("longUrl") String longUrl,
+                                    @RequestParam(name="customAlias", required = false) String customAlias,
+                                    Model model
+    ) {
 
         model.addAttribute("originalUrl", longUrl);
 
+        try{
+            String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias);
+            String fullShortCode = "http://localhost:8080/" + shortCode;
 
-        model.addAttribute("shortUrlResult", fullShortUrl);
+            model.addAttribute("shortUrlResult", fullShortCode);
+        }catch (AliasAlreadyExistsException e){
+            model.addAttribute("aliasError", e.getMessage());
+        }
+
 
         return "index";
     }

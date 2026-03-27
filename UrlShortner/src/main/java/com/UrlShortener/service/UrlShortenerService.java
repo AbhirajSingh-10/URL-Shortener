@@ -1,13 +1,16 @@
-package com.urlshrt.UrlShortener.service;
+package com.UrlShortener.service;
 
-import com.urlshrt.UrlShortener.dto.UrlStatsResponse;
-import com.urlshrt.UrlShortener.exception.UrlNotFoundException;
-import com.urlshrt.UrlShortener.model.UrlMapping;
-import com.urlshrt.UrlShortener.repository.UrlMappingRepository;
+import com.UrlShortener.dto.UrlStatsResponse;
+import com.UrlShortener.exception.AliasAlreadyExistsException;
+import com.UrlShortener.exception.UrlNotFoundException;
+import com.UrlShortener.model.UrlMapping;
+import com.UrlShortener.repository.UrlMappingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UrlShortenerService {
@@ -21,22 +24,36 @@ public class UrlShortenerService {
 
 
     @Transactional
-    public String shortenUrl(String originalUrl){
-        UrlMapping urlMapping = new UrlMapping();
+    public String shortenUrl(String originalUrl, String customAlias){
 
-        urlMapping.setOriginalUrl(originalUrl);
+        if(StringUtils.hasText(customAlias)){
+            Optional<UrlMapping> existingMapping = urlMappingRepository.findByShortCode(customAlias);
 
-        urlMapping.setCreationDate(LocalDateTime.now());
+            if(existingMapping.isPresent()){
+                throw new AliasAlreadyExistsException("Alias '"+customAlias+"' is already in use.");
+            }
 
-        UrlMapping savedEntity =urlMappingRepository.save(urlMapping);
+            UrlMapping newUrlMapping = new UrlMapping();
+            newUrlMapping.setOriginalUrl(originalUrl);
+            newUrlMapping.setCreationDate(LocalDateTime.now());
+            newUrlMapping.setShortCode(customAlias);
+            urlMappingRepository.save(newUrlMapping);
 
-        String shortCode = encodeBase62(savedEntity.getId());
+            return customAlias;
+        }else {
+            UrlMapping urlMapping = new UrlMapping();
+            urlMapping.setOriginalUrl(originalUrl);
+            urlMapping.setCreationDate(LocalDateTime.now());
 
-        savedEntity.setShortCode(shortCode);
+            UrlMapping savedEntity = urlMappingRepository.save(urlMapping);
 
-        urlMappingRepository.save(savedEntity);
+            String shortCode = encodeBase62(savedEntity.getId());
+            savedEntity.setShortCode(shortCode);
 
-        return shortCode;
+            urlMappingRepository.save(savedEntity);
+
+            return shortCode;
+        }
 
     }
 

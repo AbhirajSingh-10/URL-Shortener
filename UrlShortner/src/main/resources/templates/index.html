@@ -27,6 +27,23 @@
     <div>
         <input type="text" id="longUrl" name="longUrl" size="50" placeholder="https://example.com/very/long/url" required>
     </div>
+
+    <div>
+        <!-- A label for our new optional input field -->
+        <label for="customAlias">Enter a custom alias (optional):</label>
+    </div>
+    <div>
+        <!--
+          This is the new input field for the custom alias.
+          - name=\"customAlias\": This is CRITICAL. This is the key that our PageController
+            will use to retrieve the value from the form submission.
+          - placeholder: Provides a helpful hint about the format.
+          - Note the LACK of the 'required' attribute. This makes the field optional
+            from the browser's perspective.
+        -->
+        <input type="text" id="customAlias" name="customAlias" size="50" placeholder="e.g.,my-awesome-event">
+    </div>
+
     <div>
         <input type="submit" value="Shorten URL">
     </div>
@@ -63,6 +80,10 @@
         -->
         <a th:href="${shortUrlResult}" th:text="${shortUrlResult}" target="_blank">http://localhost:8080/short-url-goes-here</a>
     </p>
+</div>
+
+<div class="result" style="background-color: #f8d7da; border-color: #f5c6cb;" th:if="${aliasError != null}">
+    <p style="color: #721c24;" th:text="${aliasError}"></p>
 </div>
 
 

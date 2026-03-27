@@ -1,4 +1,4 @@
-package com.urlshrt.UrlShortener.dto;
+package com.UrlShortener.dto;
 
 public record ShortenUrlResponse(String url) {
 }
