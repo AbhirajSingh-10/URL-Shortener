@@ -1,0 +1,69 @@
+# docker-compose.yml
+
+# Specifies the version of the Docker Compose file format. '3.8' is a modern, stable version.
+version: '3.8'
+
+# The top-level key where all our individual container definitions (services) live.
+services:
+  # =========================================================================
+  # 1. The Database Service (PostgreSQL)
+  # =========================================================================
+  db:
+    # Use the official PostgreSQL image from Docker Hub. The '14-alpine' tag provides
+    # version 14 on a minimal Alpine Linux base, resulting in a smaller, more secure image.
+    image: postgres:14-alpine
+    # A friendly, explicit name for our database container.
+    container_name: url-shortener-db
+    # This is where we configure the PostgreSQL database itself. These environment
+    # variables are read by the PostgreSQL image on its first startup.
+    environment:
+      - POSTGRES_USER=postgres      # Sets the database superuser name.
+      - POSTGRES_PASSWORD=Database@123 # Sets the password for the superuser.
+      - POSTGRES_DB=urlshortener     # Creates a database with this name on startup.
+    # This is CRITICAL for data persistence. It maps a named volume on the host
+    # machine ('postgres-data') to the directory inside the container where
+    # PostgreSQL stores its data ('/var/lib/postgresql/data'). This ensures
+    # that our database data survives even if we stop and remove the container.
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # Maps a port on the host machine (left) to a port inside the container (right).
+    # We map port 5433 on our local machine to the standard PostgreSQL port 5432
+    # inside the container. This allows us to connect to the DB from our host
+    # using a tool like DBeaver or pgAdmin on localhost:5433.
+    ports:
+      - "5433:5432"
+
+  # =========================================================================
+  # 2. The Application Service (Our Spring Boot App)
+  # =========================================================================
+  app:
+    # Tells Docker Compose to build the image for this service. The '.' means
+    # it should look for a 'Dockerfile' in the current directory.
+    build: .
+    # A friendly, explicit name for our application container.
+    container_name: url-shortener-app
+    # This is crucial for startup order. It tells Docker Compose that the 'app'
+    # service depends on the 'db' service. Compose will start 'db' before
+    # it starts 'app'.
+    depends_on:
+      - db
+    # Maps port 8080 on our host machine to port 8080 inside the container,
+    # which is where Spring Boot runs by default. This makes our application's
+    # API accessible at http://localhost:8080.
+    ports:
+      - "8080:8080"
+    # This is where we inject our application's configuration. These environment
+    # variables will be available inside the 'app' container when it starts.
+    environment:
+      # Activates the 'prod' profile, causing Spring Boot to load 'application-prod.properties'.
+      - SPRING_PROFILES_ACTIVE=prod
+      # These values match the placeholders in 'application-prod.properties'.
+      # Crucially, they also match the credentials we configured for the 'db' service above.
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=Database@123
+
+# The top-level key where we declare named volumes.
+volumes:
+  # Declares the 'postgres-data' volume that our 'db' service uses.
+  # Docker will manage the lifecycle of this volume for us.
+  postgres-data:
