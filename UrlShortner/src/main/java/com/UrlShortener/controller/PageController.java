@@ -35,7 +35,7 @@ public class PageController {
 
         try{
             String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias,expiry);
-            String fullShortCode = "http://localhost:8080/" + shortCode;
+            String fullShortCode = "https://shrt-url.up.railway.app/" + shortCode;
 
             model.addAttribute("shortUrlResult", fullShortCode);
         }catch (AliasAlreadyExistsException e){

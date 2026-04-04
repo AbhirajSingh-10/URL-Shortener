@@ -24,7 +24,7 @@ public class UrlController {
     public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request){
         String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias(), request.hoursToExpire());
 
-        String fullShortUrl = "http://localhost:8080/"+shortCode;
+        String fullShortUrl = "https://shrt-url.up.railway.app/"+shortCode;
 
         ShortenUrlResponse response = new ShortenUrlResponse(fullShortUrl);
 
