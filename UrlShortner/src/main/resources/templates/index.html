@@ -2,136 +2,196 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Simple URL Shortener</title>
-    <!-- A little bit of styling to make it look nicer -->
+    <title>URL Shortener</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-        h1, h2 { color: #333; }
-        form div { margin-bottom: 10px; }
-        input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; }
-        input[type="submit"] { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .result { margin-top: 20px; padding: 15px; background-color: #e9f7ef; border: 1px solid #b7e4c7; border-radius: 4px; }
-        .result p { margin: 5px 0; }
-        .result a { color: #0056b3; text-decoration: none; font-weight: bold; }
-        .result a:hover { text-decoration: underline; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        h2 {
+            margin: 20px 0 10px;
+            color: #555;
+        }
+
+        label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 5px rgba(102,126,234,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #667eea;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e6fffa;
+            border: 1px solid #b2f5ea;
+        }
+
+        .error {
+            background: #ffe6e6;
+            border: 1px solid #ffb3b3;
+            color: #cc0000;
+        }
+
+        a {
+            color: #4c51bf;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .small {
+            font-size: 13px;
+            color: #777;
+        }
     </style>
 </head>
+
 <body>
 
-<h1>Welcome to the URL Shortener!</h1>
+<div class="container">
 
-<form th:action="@{/shorten-web}" method="POST">
-    <div>
-        <label for="longUrl">Enter a long URL to shorten:</label>
-    </div>
-    <div>
-        <input type="text" id="longUrl" name="longUrl" size="50" placeholder="https://example.com/very/long/url" required>
-    </div>
+    <h1>🔗 URL Shortener</h1>
 
-    <div>
-        <!-- A label for our new optional input field -->
-        <label for="customAlias">Enter a custom alias (optional):</label>
-    </div>
-    <div>
-        <!--
-          This is the new input field for the custom alias.
-          - name=\"customAlias\": This is CRITICAL. This is the key that our PageController
-            will use to retrieve the value from the form submission.
-          - placeholder: Provides a helpful hint about the format.
-          - Note the LACK of the 'required' attribute. This makes the field optional
-            from the browser's perspective.
-        -->
-        <input type="text" id="customAlias" name="customAlias" size="50" placeholder="e.g.,my-awesome-event">
-    </div>
+    <!-- SHORTEN FORM -->
+    <form th:action="@{/shorten-web}" method="POST">
 
-    <div>
-        <label for="expiry">Enter expiration time in Hours. (optional):</label>
-    </div>
-    <div>
+        <label>Enter Long URL</label>
+        <input type="text" name="longUrl" placeholder="https://example.com/very/long/url" required>
 
-        <input type="number" id="expiry" min="0" name="expiry" size="50" placeholder="e.g.,24 Hours">
+        <label>Custom Alias (Optional)</label>
+        <input type="text" name="customAlias" placeholder="e.g. my-event">
+
+        <label>Expiry Time (Hours - Optional)</label>
+        <input type="number" name="expiry" min="0" placeholder="e.g. 24">
+
+        <button type="submit">Shorten URL 🚀</button>
+    </form>
+
+    <!-- SUCCESS RESULT -->
+    <div class="result" th:if="${shortUrlResult != null}">
+        <h2>✅ Success</h2>
+        <p><strong>Original:</strong> <span th:text="${originalUrl}"></span></p>
+        <p>
+            <strong>Short:</strong>
+            <a th:href="${shortUrlResult}" th:text="${shortUrlResult}" target="_blank"></a>
+        </p>
     </div>
 
-    <div>
-        <input type="submit" value="Shorten URL">
+    <!-- ALIAS ERROR -->
+    <div class="result error" th:if="${aliasError != null}">
+        <p th:text="${aliasError}"></p>
     </div>
-</form>
 
-<!-- --- NEWLY ADDED CODE START --- -->
+    <hr>
 
-<!--
-  This entire <div> block will only be rendered IF the 'shortUrlResult' variable exists in the Model.
-  th:if="${shortUrlResult != null}" is a Thymeleaf condition.
-  On the initial page load, 'shortUrlResult' is null, so this whole block is hidden.
-  After a successful form submission, the controller adds 'shortUrlResult' to the model,
-  the condition becomes true, and this block is displayed.
--->
-<div class="result" th:if="${shortUrlResult != null}">
-    <h2>Success! Here is your short URL:</h2>
+    <!-- STATS SECTION -->
+    <div class="section">
+        <h2>📊 Check Link Statistics</h2>
 
-    <p>
-        Original URL:
-        <!--
-          th:text replaces the content of this <span> with the value of the 'originalUrl' variable from the Model.
-          We use a <span> to avoid breaking the text flow.
-        -->
-        <span th:text="${originalUrl}">https://example.com/original-url-goes-here</span>
-    </p>
+        <form th:action="@{/check-stats}" method="POST">
+            <label>Enter Short Code</label>
+            <input type="text" name="checkShortCode" placeholder="e.g. aB1cDe" required>
 
-    <p>
-        Short URL:
-        <!--
-          This is a powerful combination of Thymeleaf attributes on an anchor (<a>) tag.
-          - th:href sets the 'href' attribute, making the link clickable. It uses the value from 'shortUrlResult'.
-          - th:text sets the visible text of the link, also using 'shortUrlResult'.
-          - target="_blank" is a standard HTML attribute to open the link in a new tab.
-        -->
-        <a th:href="${shortUrlResult}" th:text="${shortUrlResult}" target="_blank">http://localhost:8080/short-url-goes-here</a>
-    </p>
-</div>
-
-<div class="result" style="background-color: #f8d7da; border-color: #f5c6cb;" th:if="${aliasError != null}">
-    <p style="color: #721c24;" th:text="${aliasError}"></p>
-</div>
-
-
-<hr>
-
-<h2>"Check Link Statistics"</h2>
-
-<form th:action="@{/check-stats}" method="POST">
-    <div>
-        <!-- The label for our new input field, linked via the 'for' attribute. -->
-        <label for="checkShortCode">Enter a short code to check its stats:</label>
+            <button type="submit">Check Stats</button>
+        </form>
     </div>
-    <div>
-        <!--
-          This is the input field for the short code.
-          - id="checkShortCode": A unique ID, used by the label.
-          - name="checkShortCode": CRITICAL! This is the key our Spring controller will use
-            to retrieve the submitted value from the request.
-          - placeholder: A helpful hint for the user.
-          - required: Prevents submitting an empty form.
-        -->
-        <input type="text" id="checkShortCode" name="checkShortCode" size="20" placeholder="e.g., aB1cDe" required>
-    </div>
-    <div>
-        <!-- The submit button for this form. -->
-        <input type="submit" value="Check Stats">
-    </div>
-</form>
 
-<div class="result" th:if="${urlStats != null}">
-    <h3>Statistics</h3>
-    <p><strong>Original URL:</strong> <span th:text="${urlStats.originalUrl}"></span></p>
-    <p><strong>Short URL:</strong> <a th:href="${urlStats.shortUrl}" th:text="${urlStats.shortUrl}" target="_blank"></a></p>
-    <p><strong>Created On:</strong> <span th:text="${#temporals.format(urlStats.creationDate, 'dd-MMM-yyyy HH:mm')}"></span></p>
-    <p><strong>Total Clicks:</strong> <span th:text="${urlStats.clickCount}"></span></p>
-</div>
+    <!-- STATS RESULT -->
+    <div class="result" th:if="${urlStats != null}">
+        <h3>📈 Statistics</h3>
+        <p><strong>Original URL:</strong> <span th:text="${urlStats.originalUrl}"></span></p>
+        <p><strong>Short URL:</strong>
+            <a th:href="${urlStats.shortUrl}" th:text="${urlStats.shortUrl}" target="_blank"></a>
+        </p>
+        <p><strong>Created On:</strong>
+            <span th:text="${#temporals.format(urlStats.creationDate, 'dd-MMM-yyyy HH:mm')}"></span>
+        </p>
+        <p><strong>Total Clicks:</strong>
+            <span th:text="${urlStats.clickCount}"></span>
+        </p>
+    </div>
 
-<!-- Case 2: Error. This block is rendered only if the "statsError" message exists in the model. -->
-<div class="result" style="background-color: #f8d7da; border-color: #f5c6cb;" th:if="${statsError != null}">
-    <p style="color: #721c24;" th:text="${statsError}"></p>
+    <!-- STATS ERROR -->
+    <div class="result error" th:if="${statsError != null}">
+        <p th:text="${statsError}"></p>
+    </div>
+
 </div>
 
 </body>
