@@ -35,7 +35,7 @@ public class PageController {
 
         try{
             String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias,expiry);
-            String fullShortCode = "https://shrt-url.up.railway.app/" + shortCode;
+            String fullShortCode = "https://nano-url.netlify.app/" + shortCode;
 
             model.addAttribute("shortUrlResult", fullShortCode);
         }catch (AliasAlreadyExistsException e){

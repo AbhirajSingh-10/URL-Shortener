@@ -24,7 +24,7 @@ public class UrlController {
     public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request){
         String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias(), request.hoursToExpire());
 
-        String fullShortUrl = "https://shrt-url.up.railway.app/"+shortCode;
+        String fullShortUrl = "https://nano-url.netlify.app/"+shortCode;
 
         ShortenUrlResponse response = new ShortenUrlResponse(fullShortUrl);
 

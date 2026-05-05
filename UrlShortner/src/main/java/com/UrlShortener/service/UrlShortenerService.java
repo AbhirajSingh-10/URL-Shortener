@@ -86,7 +86,7 @@ public class UrlShortenerService {
             throw new UrlNotFoundException("This link is expired and no longer active.");
         }
 
-        String fullShortUrl = "https://shrt-url.up.railway.app/" + urlMapping.getShortCode();
+        String fullShortUrl = "https://nano-url.netlify.app/" + urlMapping.getShortCode();
 
         return new UrlStatsResponse(
                 urlMapping.getOriginalUrl(),
