@@ -24,9 +24,13 @@ build/
 # Compiled files
 *.class
 
+
+# Package files
+*.jar
+*.war
+
 # Environment / secrets
 .env
-application.properties
 application-prod.properties
 application.yml
 
