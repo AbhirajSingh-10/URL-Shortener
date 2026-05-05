@@ -8,13 +8,28 @@ target/
 *.log
 logs/
 
+# Gradle
+build/
+.gradle/
+
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
 # Compiled files
 *.class
 
 # Environment / secrets
 .env
 application.properties
+application-prod.properties
 application.yml
+
 
 ### STS ###
 .apt_generated
@@ -26,7 +41,7 @@ application.yml
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -41,5 +56,3 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
