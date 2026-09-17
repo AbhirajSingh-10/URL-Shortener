@@ -9,9 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Value;
 
 @Controller
 public class PageController {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private final UrlShortenerService urlShortenerService;
 
@@ -35,7 +39,7 @@ public class PageController {
 
         try{
             String shortCode = urlShortenerService.shortenUrl(longUrl,customAlias,expiry);
-            String fullShortCode = "https://nano-url.netlify.app/" + shortCode;
+            String fullShortCode = baseUrl + shortCode;
 
             model.addAttribute("shortUrlResult", fullShortCode);
         }catch (AliasAlreadyExistsException e){

@@ -8,11 +8,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.net.URI;
 
 @RestController
 public class UrlController {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private final UrlShortenerService urlShortenerService;
 
@@ -24,7 +28,7 @@ public class UrlController {
     public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request){
         String shortCode = urlShortenerService.shortenUrl(request.url(), request.customAlias(), request.hoursToExpire());
 
-        String fullShortUrl = "https://nano-url.netlify.app/"+shortCode;
+        String fullShortUrl = baseUrl+shortCode;
 
         ShortenUrlResponse response = new ShortenUrlResponse(fullShortUrl);
 

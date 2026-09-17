@@ -8,12 +8,16 @@ import com.UrlShortener.repository.UrlMappingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 public class UrlShortenerService {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
     private final UrlMappingRepository urlMappingRepository;
 
     private static final String BASE62_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -86,7 +90,7 @@ public class UrlShortenerService {
             throw new UrlNotFoundException("This link is expired and no longer active.");
         }
 
-        String fullShortUrl = "https://nano-url.netlify.app/" + urlMapping.getShortCode();
+        String fullShortUrl = baseUrl + urlMapping.getShortCode();
 
         return new UrlStatsResponse(
                 urlMapping.getOriginalUrl(),
