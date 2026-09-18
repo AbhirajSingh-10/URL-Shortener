@@ -31,8 +31,6 @@ build/
 
 # Environment / secrets
 .env
-application-prod.properties
-application.yml
 
 
 ### STS ###
