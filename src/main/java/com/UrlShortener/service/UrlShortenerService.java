@@ -75,6 +75,10 @@ public class UrlShortenerService {
         UrlMapping urlMapping = urlMappingRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new UrlNotFoundException("Url not found with shortCode :"+shortCode));
 
+        if(urlMapping.getExpirationDate() != null && !urlMapping.getExpirationDate().isAfter(LocalDateTime.now())){
+            throw new UrlNotFoundException("This link is expired and no longer active.");
+        }
+
         urlMapping.setClickCount(urlMapping.getClickCount()+1);
         urlMappingRepository.save(urlMapping);
 
